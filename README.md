@@ -1,0 +1,1 @@
+This component will allow users on a mobile device to swipe left on a topic, to bring up options to `dismiss unreads`, `untrack topic`, or `untrack category`.
