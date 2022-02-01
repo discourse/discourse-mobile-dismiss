@@ -1,5 +1,7 @@
 import Component from "@ember/component";
+import Category from "discourse/models/category";
 import discourseComputed from "discourse-common/utils/decorators";
+import { ajax } from "discourse/lib/ajax";
 import { action } from "@ember/object";
 import { alias } from "@ember/object/computed";
 
@@ -14,18 +16,34 @@ export default Component.extend({
     this._super(...arguments);
   },
 
-  @action
-  dismissTopic() {
-    console.log(this["data-topic-id"]);
+  @discourseComputed("args.topic.category_id")
+  category(category_id) {
+    return Category.findById(category_id);
+  },
+
+  @discourseComputed("args.topic.details.notification_level")
+  topicTracked(notificationLevel) {
+    return notificationLevel > 1;
+  },
+
+  @discourseComputed("category.notification_level")
+  categoryTracked(notificationLevel) {
+    return notificationLevel > 1;
   },
 
   @action
   untrackTopic() {
-    console.log(this["data-topic-id"]);
+    // currently does not update `topicTracked` after ajax call
+    this.set("isUntrackingTopic", true)
+    this.args.topic.details
+      .updateNotifications(1)
+      .finally(() => this.appEvents.trigger("mobile-swipe:untrack", false, this.categoryTracked))
   },
 
   @action
   untrackCategory() {
-    console.log(this["data-category-id"]);
+    this.category.setNotification(1).then(() => {
+      this.appEvents.trigger("mobile-swipe:untrack", this.topicTracked, false)
+    })
   },
 })

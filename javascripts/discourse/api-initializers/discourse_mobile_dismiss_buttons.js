@@ -1,15 +1,46 @@
 import { apiInitializer } from "discourse/lib/api";
+import Category from "discourse/models/category";
+import discourseComputed, { bind } from "discourse-common/utils/decorators";
+import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", api => {
   api.modifyClass("component:topic-list-item", {
+    "xDown": 0,
+    "xUp": 0,
+    "yDown": 0,
+    "yUp": 0,
+
     didInsertElement() {
       this._super(...arguments);
-      this.addTouchListeners(this.element);
+      if (this.isTrackingTopic || this.isTrackingCategory) {
+        this.addTouchListeners(this.element);
+        this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe")
+      }
     },
 
     willDestroyElement() {
       this._super(...arguments);
       this.removeTouchListeners(this.element);
+      this.appEvents.off("mobile-swipe:untrack", this, "resetSwipe")
+    },
+
+    @discourseComputed("topic.details.notification_level")
+    isTrackingTopic(notification_level) {
+      return notification_level > 1
+    },
+
+    @discourseComputed("topic.category_id")
+    isTrackingCategory(category_id) {
+      let category = Category.findById(category_id);
+      return category.notification_level > 1;
+    },
+
+    @action
+    resetSwipe(topicTracked, categoryTracked) {
+      this.element.classList.remove("swiped");
+      if (!topicTracked && !categoryTracked) {
+        this.removeTouchListeners(this.element);
+      }
     },
 
     handleGesture(xUp, xDown, yUp, yDown) {
@@ -29,42 +60,38 @@ export default apiInitializer("0.11.1", api => {
 
     addTouchListeners(element) {
       if (this.site.mobileView) {
-        let xDown = 0;
-        let xUp = 0;
-        let yDown = 0;
-        let yUp = 0;
-
-        this.touchStart = e => {
-          xDown = e.changedTouches[0].screenX;
-          yDown = e.changedTouches[0].screenY;
-        };
-        this.touchMove = e => {
-          xUp = e.changedTouches[0].screenX;
-          yUp = e.changedTouches[0].screenY;
-          this.handleGesture(xUp, xDown, yUp, yDown);
-        };
-        this.touchEnd = e => {
-          xUp = e.changedTouches[0].screenX;
-          yUp = e.changedTouches[0].screenY;
-          this.handleGesture(xUp, xDown, yUp, yDown);
-        };
-
-        const opts = {
-          passive: false
-        };
-
-        element.addEventListener("touchstart", this.touchStart, opts);
-        element.addEventListener("touchmove", this.touchMove, opts);
-        element.addEventListener("touchend", this.touchEnd, opts);
+        element.addEventListener("touchstart", this.touchStartSwipe, false);
+        element.addEventListener("touchmove", this.touchMoveSwipe, false);
+        element.addEventListener("touchend", this.touchEndSwipe, false);
       }
     },
 
     removeTouchListeners(element) {
       if (this.site.mobileView) {
-        element.removeEventListener("touchstart", this.touchStart);
-        element.removeEventListener("touchmove", this.touchMove);
-        element.removeEventListener("touchend", this.touchEnd);
+        element.removeEventListener("touchstart", this.touchStartSwipe, false);
+        element.removeEventListener("touchmove", this.touchMoveSwipe, false);
+        element.removeEventListener("touchend", this.touchEndSwipe, false);
       }
+    },
+
+    @bind
+    touchStartSwipe(e) {
+      this.xDown = e.changedTouches[0].screenX;
+      this.yDown = e.changedTouches[0].screenY;
+    },
+
+    @bind
+    touchMoveSwipe(e) {
+      this.xUp = e.changedTouches[0].screenX;
+      this.yUp = e.changedTouches[0].screenY;
+      this.handleGesture(this.xUp, this.xDown, this.yUp, this.yDown);
+    },
+
+    @bind
+    touchEndSwipe(e) {
+      this.xUp = e.changedTouches[0].screenX;
+      this.yUp = e.changedTouches[0].screenY;
+      this.handleGesture(this.xUp, this.xDown, this.yUp, this.yDown);
     }
   });
 });

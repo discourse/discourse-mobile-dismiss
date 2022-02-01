@@ -1,3 +1,18 @@
-{{d-button icon="comment-slash" class="mobile-dismiss-container-button mark-as-read" action=(action "dismissTopic") translatedLabel=(theme-setting "mark_as_read")}}
-{{d-button icon="far-eye-slash" class="mobile-dismiss-container-button untrack-topic" action=(action "untrackTopic") translatedLabel=(theme-setting "untrack_topic")}}
-{{d-button icon="far-bell-slash" class="mobile-dismiss-container-button untrack-category" action=(action "untrackCategory") translatedLabel=(theme-setting "untrack_category")}}
+{{!-- {{d-button icon="comment-slash" class="mobile-dismiss-container-button mark-as-read" action=(action "dismissTopic") translatedLabel=(theme-setting "mark_as_read")}} --}}
+{{#if topicTracked}}
+  {{d-button 
+    icon="far-eye-slash" 
+    class="mobile-dismiss-container-button untrack-topic" 
+    action=(action "untrackTopic")
+    translatedLabel=(theme-setting "untrack_topic") 
+  }}
+{{/if}}
+
+{{#if categoryTracked}}
+  {{d-button 
+    icon="far-bell-slash"
+    class="mobile-dismiss-container-button untrack-category" 
+    action=(action "untrackCategory")
+    translatedLabel=(theme-setting "untrack_category")
+  }}
+{{/if}}
