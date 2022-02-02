@@ -21,9 +21,14 @@ export default Component.extend({
     return Category.findById(category_id);
   },
 
-  @discourseComputed("args.topic.details.notification_level")
-  topicTracked(notificationLevel) {
-    return notificationLevel > 1;
+  @discourseComputed(
+    "args.topic.notification_level",
+    "args.topic.details.notification_level"
+  )
+  topicTracked(notification_level, preferredNotification_level) {
+    return preferredNotification_level !== undefined
+      ? preferredNotification_level > 1
+      : notification_level > 1;
   },
 
   @discourseComputed("category.notification_level")
@@ -33,17 +38,22 @@ export default Component.extend({
 
   @action
   untrackTopic() {
-    // currently does not update `topicTracked` after ajax call
-    this.set("isUntrackingTopic", true)
+    this.set("isUntrackingTopic", true);
     this.args.topic.details
       .updateNotifications(1)
-      .finally(() => this.appEvents.trigger("mobile-swipe:untrack", false, this.categoryTracked))
+      .finally(() =>
+        this.appEvents.trigger(
+          "mobile-swipe:untrack",
+          false,
+          this.categoryTracked
+        )
+      );
   },
 
   @action
   untrackCategory() {
     this.category.setNotification(1).then(() => {
-      this.appEvents.trigger("mobile-swipe:untrack", this.topicTracked, false)
-    })
-  },
-})
+      this.appEvents.trigger("mobile-swipe:untrack", this.topicTracked, false);
+    });
+  }
+});

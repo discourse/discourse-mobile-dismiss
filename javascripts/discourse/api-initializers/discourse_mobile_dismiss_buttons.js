@@ -5,28 +5,33 @@ import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", api => {
   api.modifyClass("component:topic-list-item", {
-    "xDown": 0,
-    "xUp": 0,
-    "yDown": 0,
-    "yUp": 0,
+    xDown: 0,
+    xUp: 0,
+    yDown: 0,
+    yUp: 0,
 
     didInsertElement() {
       this._super(...arguments);
       if (this.isTrackingTopic || this.isTrackingCategory) {
         this.addTouchListeners(this.element);
-        this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe")
+        this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe");
       }
     },
 
     willDestroyElement() {
       this._super(...arguments);
       this.removeTouchListeners(this.element);
-      this.appEvents.off("mobile-swipe:untrack", this, "resetSwipe")
+      this.appEvents.off("mobile-swipe:untrack", this, "resetSwipe");
     },
 
-    @discourseComputed("topic.details.notification_level")
-    isTrackingTopic(notification_level) {
-      return notification_level > 1
+    @discourseComputed(
+      "topic.notification_level",
+      "topic.details.notificaion_level"
+    )
+    isTrackingTopic(notification_level, preferredNotification_level) {
+      return preferredNotification_level !== undefined
+        ? preferredNotification_level > 1
+        : notification_level > 1;
     },
 
     @discourseComputed("topic.category_id")
@@ -36,9 +41,9 @@ export default apiInitializer("0.11.1", api => {
     },
 
     @action
-    resetSwipe(topicTracked, categoryTracked) {
+    resetSwipe(isTrackingTopicFromAppEvent, isTrackingCategoryFromAppEvent) {
       this.element.classList.remove("swiped");
-      if (!topicTracked && !categoryTracked) {
+      if (!isTrackingTopicFromAppEvent && !isTrackingCategoryFromAppEvent) {
         this.removeTouchListeners(this.element);
       }
     },
