@@ -28,10 +28,10 @@ export default apiInitializer("0.11.1", api => {
       "topic.notification_level",
       "topic.details.notificaion_level"
     )
-    isTrackingTopic(notification_level, preferredNotification_level) {
-      return preferredNotification_level !== undefined
-        ? preferredNotification_level > 1
-        : notification_level > 1;
+    isTrackingTopic(notificationLevel, preferredNotificationLevel) {
+      return preferredNotificationLevel !== undefined
+        ? preferredNotificationLevel > 1
+        : notificationLevel > 1;
     },
 
     @discourseComputed("topic.category_id")

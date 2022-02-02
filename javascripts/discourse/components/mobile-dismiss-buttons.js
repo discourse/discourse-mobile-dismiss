@@ -25,10 +25,10 @@ export default Component.extend({
     "args.topic.notification_level",
     "args.topic.details.notification_level"
   )
-  topicTracked(notification_level, preferredNotification_level) {
-    return preferredNotification_level !== undefined
-      ? preferredNotification_level > 1
-      : notification_level > 1;
+  topicTracked(notificationLevel, preferredNotificationLevel) {
+    return preferredNotificationLevel !== undefined
+      ? preferredNotificationLevel > 1
+      : notificationLevel > 1;
   },
 
   @discourseComputed("category.notification_level")
