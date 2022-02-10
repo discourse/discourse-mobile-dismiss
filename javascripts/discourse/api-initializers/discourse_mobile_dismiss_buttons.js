@@ -5,6 +5,8 @@ import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", api => {
   api.modifyClass("component:topic-list-item", {
+    pluginId: "discourse-mobile-dismiss",
+
     xDown: 0,
     xUp: 0,
     yDown: 0,
