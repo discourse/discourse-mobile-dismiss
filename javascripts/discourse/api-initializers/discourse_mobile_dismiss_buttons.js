@@ -29,7 +29,7 @@ export default apiInitializer("0.11.1", api => {
 
     @discourseComputed(
       "topic.notification_level",
-      "topic.details.notificaion_level"
+      "topic.details.notification_level"
     )
     isTrackingTopic(notificationLevel, preferredNotificationLevel) {
       return preferredNotificationLevel !== undefined
