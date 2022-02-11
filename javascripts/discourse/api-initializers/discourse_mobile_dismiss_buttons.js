@@ -3,7 +3,7 @@ import Category from "discourse/models/category";
 import discourseComputed, { bind } from "discourse-common/utils/decorators";
 import { action } from "@ember/object";
 
-export default apiInitializer("0.11.1", api => {
+export default apiInitializer("0.11.1", (api) => {
   api.modifyClass("component:topic-list-item", {
     classNameBindings: ["swiped"],
 
@@ -100,6 +100,6 @@ export default apiInitializer("0.11.1", api => {
       this.xUp = e.changedTouches[0].screenX;
       this.yUp = e.changedTouches[0].screenY;
       this.handleGesture(this.xUp, this.xDown, this.yUp, this.yDown);
-    }
+    },
   });
 });

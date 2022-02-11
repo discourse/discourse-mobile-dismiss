@@ -1,7 +1,6 @@
 import Component from "@ember/component";
 import Category from "discourse/models/category";
 import discourseComputed from "discourse-common/utils/decorators";
-import { ajax } from "discourse/lib/ajax";
 import { action } from "@ember/object";
 import { alias } from "@ember/object/computed";
 
@@ -55,5 +54,5 @@ export default Component.extend({
     this.category.setNotification(1).then(() => {
       this.appEvents.trigger("mobile-swipe:untrack", this.topicTracked, false);
     });
-  }
+  },
 });
