@@ -9,7 +9,6 @@ export default apiInitializer("0.11.1", (api) => {
 
     classNameBindings: ["swiped"],
 
-    swiped: false,
     xDown: 0,
     xUp: 0,
     yDown: 0,
@@ -18,14 +17,14 @@ export default apiInitializer("0.11.1", (api) => {
     didInsertElement() {
       this._super(...arguments);
       if (this.isTrackingTopic || this.isTrackingCategory) {
-        this.addTouchListeners(this.element);
+        this.addTouchListeners();
         this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe");
       }
     },
 
     willDestroyElement() {
       this._super(...arguments);
-      this.removeTouchListeners(this.element);
+      this.removeTouchListeners();
       this.appEvents.off("mobile-swipe:untrack", this, "resetSwipe");
     },
 
@@ -45,63 +44,70 @@ export default apiInitializer("0.11.1", (api) => {
       return category.notification_level > 1;
     },
 
+    @discourseComputed("xDown", "xUp", "yDown", "yUp")
+    swiped(xDown, xUp, yDown, yUp) {
+      // https://stackoverflow.com/a/23230280/8418914
+      const xDiff = xDown - xUp;
+      const yDiff = yDown - yUp;
+
+      // make sure not swiping up or down
+      return Math.abs(xDiff) > Math.abs(yDiff) && xDiff > 0;
+    },
+
     @action
     resetSwipe(isTrackingTopicFromAppEvent, isTrackingCategoryFromAppEvent) {
       this.set("swiped", false);
       if (!isTrackingTopicFromAppEvent && !isTrackingCategoryFromAppEvent) {
-        this.removeTouchListeners(this.element);
+        this.removeTouchListeners();
       }
     },
 
-    handleGesture(xUp, xDown, yUp, yDown) {
-      // https://stackoverflow.com/a/23230280/8418914
-      let xDiff = xDown - xUp;
-      let yDiff = yDown - yUp;
-
-      if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        /* make sure not swiping up or down */
-        if (xDiff > 0) {
-          this.set("swiped", true);
-        } else {
-          this.set("swiped", false);
-        }
-      }
-    },
-
-    addTouchListeners(element) {
+    addTouchListeners() {
       if (this.site.mobileView) {
-        element.addEventListener("touchstart", this.touchStartSwipe, false);
-        element.addEventListener("touchmove", this.touchMoveSwipe, false);
-        element.addEventListener("touchend", this.touchEndSwipe, false);
+        this.element.addEventListener(
+          "touchstart",
+          this.touchStartSwipe,
+          false
+        );
+        this.element.addEventListener("touchmove", this.touchMoveSwipe, false);
+        this.element.addEventListener("touchend", this.touchEndSwipe, false);
       }
     },
 
-    removeTouchListeners(element) {
+    removeTouchListeners() {
       if (this.site.mobileView) {
-        element.removeEventListener("touchstart", this.touchStartSwipe, false);
-        element.removeEventListener("touchmove", this.touchMoveSwipe, false);
-        element.removeEventListener("touchend", this.touchEndSwipe, false);
+        this.element.removeEventListener(
+          "touchstart",
+          this.touchStartSwipe,
+          false
+        );
+        this.element.removeEventListener(
+          "touchmove",
+          this.touchMoveSwipe,
+          false
+        );
+        this.element.removeEventListener("touchend", this.touchEndSwipe, false);
       }
     },
 
     @bind
     touchStartSwipe(e) {
-      this.xDown = e.changedTouches[0].screenX;
-      this.yDown = e.changedTouches[0].screenY;
+      this.set("xDown", e.changedTouches[0].screenX);
+      this.set("xUp", e.changedTouches[0].screenX);
+      this.set("yDown", e.changedTouches[0].screenY);
+      this.set("yUp", e.changedTouches[0].screenY);
     },
 
     @bind
     touchMoveSwipe(e) {
-      this.xUp = e.changedTouches[0].screenX;
-      this.yUp = e.changedTouches[0].screenY;
-      this.handleGesture(this.xUp, this.xDown, this.yUp, this.yDown);
+      this.set("xUp", e.changedTouches[0].screenX);
+      this.set("yUp", e.changedTouches[0].screenY);
     },
 
     @bind
     touchEndSwipe(e) {
-      this.xUp = e.changedTouches[0].screenX;
-      this.yUp = e.changedTouches[0].screenY;
-      this.handleGesture(this.xUp, this.xDown, this.yUp, this.yDown);
+      this.set("xUp", e.changedTouches[0].screenX);
+      this.set("yUp", e.changedTouches[0].screenY);
     },
   });
 });

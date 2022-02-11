@@ -2,27 +2,23 @@ import Component from "@ember/component";
 import Category from "discourse/models/category";
 import discourseComputed from "discourse-common/utils/decorators";
 import { action } from "@ember/object";
-import { alias } from "@ember/object/computed";
+import { readOnly } from "@ember/object/computed";
 
 export default Component.extend({
   tagName: "div",
   classNames: ["mobile-dismiss-container"],
   attributeBindings: ["data-topic-id", "data-category-id"],
-  "data-topic-id": alias("args.topic.id"),
-  "data-category-id": alias("args.topic.category_id"),
+  "data-topic-id": readOnly("topic.id"),
+  "data-category-id": readOnly("topic.category_id"),
 
-  init() {
-    this._super(...arguments);
-  },
-
-  @discourseComputed("args.topic.category_id")
+  @discourseComputed("topic.category_id")
   category(category_id) {
     return Category.findById(category_id);
   },
 
   @discourseComputed(
-    "args.topic.notification_level",
-    "args.topic.details.notification_level"
+    "topic.notification_level",
+    "topic.details.notification_level"
   )
   topicTracked(notificationLevel, preferredNotificationLevel) {
     return preferredNotificationLevel !== undefined
@@ -37,8 +33,7 @@ export default Component.extend({
 
   @action
   untrackTopic() {
-    this.set("isUntrackingTopic", true);
-    this.args.topic.details
+    this.topic.details
       .updateNotifications(1)
       .finally(() =>
         this.appEvents.trigger(
