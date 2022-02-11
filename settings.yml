@@ -1,6 +1,3 @@
-mark_as_read:
-  type: string
-  default: "Mark as Read"
 untrack_topic:
   type: string
   default: "Untrack Topic"
