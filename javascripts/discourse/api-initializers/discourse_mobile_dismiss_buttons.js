@@ -5,6 +5,9 @@ import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", api => {
   api.modifyClass("component:topic-list-item", {
+    classNameBindings: ["swiped"],
+
+    swiped: false,
     xDown: 0,
     xUp: 0,
     yDown: 0,
@@ -42,7 +45,7 @@ export default apiInitializer("0.11.1", api => {
 
     @action
     resetSwipe(isTrackingTopicFromAppEvent, isTrackingCategoryFromAppEvent) {
-      this.element.classList.remove("swiped");
+      this.set("swiped", false);
       if (!isTrackingTopicFromAppEvent && !isTrackingCategoryFromAppEvent) {
         this.removeTouchListeners(this.element);
       }
@@ -56,9 +59,9 @@ export default apiInitializer("0.11.1", api => {
       if (Math.abs(xDiff) > Math.abs(yDiff)) {
         /* make sure not swiping up or down */
         if (xDiff > 0) {
-          this.element.classList.add("swiped");
+          this.set("swiped", true);
         } else {
-          this.element.classList.remove("swiped");
+          this.set("swiped", false);
         }
       }
     },
