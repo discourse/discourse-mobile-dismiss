@@ -15,14 +15,14 @@ export default apiInitializer("0.11.1", (api) => {
     didInsertElement() {
       this._super(...arguments);
       if (this.isTrackingTopic || this.isTrackingCategory) {
-        this.addTouchListeners(this.element);
+        this.addTouchListeners();
         this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe");
       }
     },
 
     willDestroyElement() {
       this._super(...arguments);
-      this.removeTouchListeners(this.element);
+      this.removeTouchListeners();
       this.appEvents.off("mobile-swipe:untrack", this, "resetSwipe");
     },
 
@@ -56,30 +56,44 @@ export default apiInitializer("0.11.1", (api) => {
     resetSwipe(isTrackingTopicFromAppEvent, isTrackingCategoryFromAppEvent) {
       this.set("swiped", false);
       if (!isTrackingTopicFromAppEvent && !isTrackingCategoryFromAppEvent) {
-        this.removeTouchListeners(this.element);
+        this.removeTouchListeners();
       }
     },
 
-    addTouchListeners(element) {
+    addTouchListeners() {
       if (this.site.mobileView) {
-        element.addEventListener("touchstart", this.touchStartSwipe, false);
-        element.addEventListener("touchmove", this.touchMoveSwipe, false);
-        element.addEventListener("touchend", this.touchEndSwipe, false);
+        this.element.addEventListener(
+          "touchstart",
+          this.touchStartSwipe,
+          false
+        );
+        this.element.addEventListener("touchmove", this.touchMoveSwipe, false);
+        this.element.addEventListener("touchend", this.touchEndSwipe, false);
       }
     },
 
-    removeTouchListeners(element) {
+    removeTouchListeners() {
       if (this.site.mobileView) {
-        element.removeEventListener("touchstart", this.touchStartSwipe, false);
-        element.removeEventListener("touchmove", this.touchMoveSwipe, false);
-        element.removeEventListener("touchend", this.touchEndSwipe, false);
+        this.element.removeEventListener(
+          "touchstart",
+          this.touchStartSwipe,
+          false
+        );
+        this.element.removeEventListener(
+          "touchmove",
+          this.touchMoveSwipe,
+          false
+        );
+        this.element.removeEventListener("touchend", this.touchEndSwipe, false);
       }
     },
 
     @bind
     touchStartSwipe(e) {
       this.set("xDown", e.changedTouches[0].screenX);
+      this.set("xUp", e.changedTouches[0].screenX);
       this.set("yDown", e.changedTouches[0].screenY);
+      this.set("yUp", e.changedTouches[0].screenY);
     },
 
     @bind
@@ -92,6 +106,6 @@ export default apiInitializer("0.11.1", (api) => {
     touchEndSwipe(e) {
       this.set("xUp", e.changedTouches[0].screenX);
       this.set("yUp", e.changedTouches[0].screenY);
-    }
+    },
   });
 });
