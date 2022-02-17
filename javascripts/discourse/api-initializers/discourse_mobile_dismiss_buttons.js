@@ -1,11 +1,13 @@
 import { apiInitializer } from "discourse/lib/api";
 import Category from "discourse/models/category";
 import discourseComputed, { bind } from "discourse-common/utils/decorators";
+import { inject as service } from "@ember/service";
 import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", (api) => {
   api.modifyClass("component:topic-list-item", {
     pluginId: "discourse-mobile-dismiss",
+    router: service(),
 
     classNameBindings: ["swiped"],
 
@@ -16,7 +18,8 @@ export default apiInitializer("0.11.1", (api) => {
 
     didInsertElement() {
       this._super(...arguments);
-      if (this.isTrackingTopic || this.isTrackingCategory) {
+      let isTopicList = this.router.currentRoute.name.includes("discovery");
+      if ((this.isTrackingTopic || this.isTrackingCategory) && isTopicList) {
         this.addTouchListeners();
         this.appEvents.on("mobile-swipe:untrack", this, "resetSwipe");
       }
