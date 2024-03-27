@@ -1,8 +1,8 @@
 import Component from "@ember/component";
-import Category from "discourse/models/category";
-import discourseComputed from "discourse-common/utils/decorators";
 import { action } from "@ember/object";
 import { readOnly } from "@ember/object/computed";
+import Category from "discourse/models/category";
+import discourseComputed from "discourse-common/utils/decorators";
 
 export default Component.extend({
   tagName: "div",
