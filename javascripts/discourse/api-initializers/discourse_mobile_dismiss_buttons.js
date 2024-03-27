@@ -1,8 +1,8 @@
+import { action } from "@ember/object";
+import { service } from "@ember/service";
 import { apiInitializer } from "discourse/lib/api";
 import Category from "discourse/models/category";
 import discourseComputed, { bind } from "discourse-common/utils/decorators";
-import { inject as service } from "@ember/service";
-import { action } from "@ember/object";
 
 export default apiInitializer("0.11.1", (api) => {
   api.modifyClass("component:topic-list-item", {
