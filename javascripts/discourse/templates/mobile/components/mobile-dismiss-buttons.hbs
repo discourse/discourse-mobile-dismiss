@@ -1,4 +1,4 @@
-{{#if topicTracked}}
+{{#if this.topicTracked}}
   {{d-button
     icon="far-eye-slash"
     class="mobile-dismiss-container-button untrack-topic"
@@ -7,7 +7,7 @@
   }}
 {{/if}}
 
-{{#if categoryTracked}}
+{{#if this.categoryTracked}}
   {{d-button
     icon="far-bell-slash"
     class="mobile-dismiss-container-button untrack-category"
